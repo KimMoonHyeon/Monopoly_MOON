@@ -30,11 +30,16 @@ public class UI_Setting_S : MonoBehaviour
 	public Text Player_money;
 	public int buy_sum;
 	public int my_money;
-
+	public GameObject[] Land_House;
+	public GameObject house_prefabs;
+	public GameObject festival_prefabs;
+	public bool[] Land_House_Buy;
 	void Start()
 	{
 		my_money = 3000000;
-		land_money = new int[3] { 1, 2, 3 };
+		land_money = new int[4] { 1, 2, 3, 4 };
+		Land_House_Buy = new bool[4] { false, false, false, false};
+		Land_House = new GameObject[32];
 
 		UI_Ob = GameObject.Find("UI");
 		Player_1 = GameObject.Find("Player_1");
@@ -63,6 +68,7 @@ public class UI_Setting_S : MonoBehaviour
 	//구매 UI
 	public void Normal_Land_Buy_UI()
 	{
+		
 		//state_time = 0f;
 		state = true;
 		if (state_time > 1f)
@@ -149,24 +155,32 @@ public class UI_Setting_S : MonoBehaviour
 	//구매 UI에서 집 클리깃 체크표시
 	public void Button_house()
     {
-		Debug.Log("?");
 		if (EventSystem.current.currentSelectedGameObject.transform.GetChild(0).gameObject.activeSelf == false)
 		{
-			Debug.Log("!");
+
 			EventSystem.current.currentSelectedGameObject.transform.GetChild(0).gameObject.SetActive(true);
 			if(EventSystem.current.currentSelectedGameObject.transform.GetChild(0).gameObject.name == "Check_1")
             {
 				buy_sum += land_money[0];
+				Land_House_Buy[0] = true;
 				Debug.Log(buy_sum);
 			}
 			else if (EventSystem.current.currentSelectedGameObject.transform.GetChild(0).gameObject.name == "Check_2")
 			{
 				buy_sum += land_money[1];
+				Land_House_Buy[1] = true;
 				Debug.Log(buy_sum);
 			}
 			else if (EventSystem.current.currentSelectedGameObject.transform.GetChild(0).gameObject.name == "Check_3")
 			{
 				buy_sum += land_money[2];
+				Land_House_Buy[2] = true;
+				Debug.Log(buy_sum);
+			}
+			else if (EventSystem.current.currentSelectedGameObject.transform.GetChild(0).gameObject.name == "Check_4")
+			{
+				buy_sum += land_money[3];
+				Land_House_Buy[3] = true;
 				Debug.Log(buy_sum);
 			}
 		}
@@ -176,28 +190,34 @@ public class UI_Setting_S : MonoBehaviour
 			if (EventSystem.current.currentSelectedGameObject.transform.GetChild(0).gameObject.name == "Check_1")
 			{
 				buy_sum -= land_money[0];
+				Land_House_Buy[0] = false;
 				Debug.Log(-buy_sum);
 			}
 			else if (EventSystem.current.currentSelectedGameObject.transform.GetChild(0).gameObject.name == "Check_2")
 			{
 				buy_sum -= land_money[1];
+				Land_House_Buy[1] = false;
 				Debug.Log(-buy_sum);
 			}
 			else if (EventSystem.current.currentSelectedGameObject.transform.GetChild(0).gameObject.name == "Check_3")
 			{
 				buy_sum -= land_money[2];
+				Land_House_Buy[2] = false;
+				Debug.Log(-buy_sum);
+			}
+			else if (EventSystem.current.currentSelectedGameObject.transform.GetChild(0).gameObject.name == "Check_4")
+			{
+				buy_sum -= land_money[3];
+				Land_House_Buy[3] = false;
 				Debug.Log(-buy_sum);
 			}
 		}
-
-		
-		Buy_text.GetComponent<Text>().text = buy_sum.ToString();
-		
-
+		Buy_text.GetComponent<Text>().text = buy_sum.ToString();		
 	}
 
 	public void Buy_Butoon()
     {
+		
 		state = false;
 		state_time = 0f;
 
@@ -208,7 +228,21 @@ public class UI_Setting_S : MonoBehaviour
 		my_money -= buy_sum;
 		buy_sum = 0;
 		Player_money.GetComponent<Text>().text = my_money.ToString();
-		
+		House(1);
+	}
+
+	public void Festival_Buy_Button()
+    {
+		state = false;
+		state_time = 0f;
+
+		UI_Ob.transform.GetChild(1).gameObject.SetActive(false);
+		Player_1.GetComponent<Player_S>().UI_Buy_bool = false;
+
+		my_money -= buy_sum;
+		buy_sum = 0;
+		Player_money.GetComponent<Text>().text = my_money.ToString();
+		House(2);
 	}
 
 	public void Start_UI()
@@ -390,5 +424,74 @@ public class UI_Setting_S : MonoBehaviour
 			state = false;
 			Player_1.GetComponent<Player_S>().UI_Buy_bool = true;
 		}
+	}
+
+	public void Fireworkss_On()
+    {
+		for (int i = 0; i < 11; i++)
+		{
+			GameObject.Find("Fireworks").gameObject.transform.GetChild(i).gameObject.SetActive(true);
+		}
+    }
+
+	public void End_Button()
+    {
+
+    }
+	
+	public void House(int land_type) // 1: 일반땅, 2: 축제땅
+    {
+		//현재 턴이 누구냐에 따라 색 변환하게.
+
+		int land_number = GameObject.Find("Player_1").GetComponent<Player_S>().stop_land_number;
+
+		if (land_type == 1)
+		{
+			Land_House[land_number] = Instantiate(house_prefabs);
+		}
+		else if (land_type == 2)
+		{
+			Land_House[land_number] = Instantiate(festival_prefabs);
+		}
+
+		Land_House[land_number].transform.position = GameObject.Find(land_number.ToString()).transform.position;
+
+		if(GameObject.Find(land_number.ToString()).tag == "SummerWinter")
+        {
+			Land_House[land_number].transform.position = new Vector3(Land_House[land_number].transform.position.x - 0.845f, 0.5f, Land_House[land_number].transform.position.z );
+			Land_House[land_number].transform.Rotate(new Vector3(0, 270, 0)); // 봄가을과 건물이 바라보는 방향이 다름.
+		}
+		else if (GameObject.Find(land_number.ToString()).tag == "SpringFall")
+        {
+			Land_House[land_number].transform.position = new Vector3(Land_House[land_number].transform.position.x, 0.5f, Land_House[land_number].transform.position.z + 0.902f );
+		}
+		else if (GameObject.Find(land_number.ToString()).tag == "Festival_SummerWinter")
+        {
+			Land_House[land_number].transform.position = new Vector3(Land_House[land_number].transform.position.x - 0.845f, 0.5f, Land_House[land_number].transform.position.z);
+			Land_House[land_number].transform.Rotate(new Vector3(0, 270, 0));
+		}
+		else if (GameObject.Find(land_number.ToString()).tag == "Festival_SpringFall")
+		{
+			Land_House[land_number].transform.position = new Vector3(Land_House[land_number].transform.position.x, 0.5f, Land_House[land_number].transform.position.z + 0.902f);
+		}
+
+		
+		for (int i=0; i<3; i++)
+        {
+			if(Land_House_Buy[i] == true)
+            {
+				Land_House[land_number].transform.GetChild(i).gameObject.SetActive(true);
+			}
+        }
+		if(Land_House_Buy[3] == true)
+        {
+			for (int i = 0; i < 3; i++)
+			{
+				Land_House[land_number].transform.GetChild(i).gameObject.SetActive(false);
+				
+			}
+			Land_House[land_number].transform.GetChild(3).gameObject.SetActive(true);
+		}
+
 	}
 }
