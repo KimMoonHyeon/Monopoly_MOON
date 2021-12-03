@@ -26,6 +26,7 @@ public class UI_Setting_S : MonoBehaviour
 	public Image Buy_Image;
 	public Image Festival_Image;
 	public Image Golend_Key_Image;
+	public Image Victory_Image;
 	public Text Buy_text;
 	public Text Player_money;
 	public int buy_sum;
@@ -34,8 +35,11 @@ public class UI_Setting_S : MonoBehaviour
 	public GameObject house_prefabs;
 	public GameObject festival_prefabs;
 	public bool[] Land_House_Buy;
+	Coroutine mycor1;
+
 	void Start()
 	{
+
 		my_money = 3000000;
 		land_money = new int[4] { 1, 2, 3, 4 };
 		Land_House_Buy = new bool[4] { false, false, false, false};
@@ -227,8 +231,9 @@ public class UI_Setting_S : MonoBehaviour
 
 		my_money -= buy_sum;
 		buy_sum = 0;
-		Player_money.GetComponent<Text>().text = my_money.ToString();
+		//Player_money.GetComponent<Text>().text = my_money.ToString();
 		House(1);
+		Victory(3);
 	}
 
 	public void Festival_Buy_Button()
@@ -243,6 +248,7 @@ public class UI_Setting_S : MonoBehaviour
 		buy_sum = 0;
 		Player_money.GetComponent<Text>().text = my_money.ToString();
 		House(2);
+		Season_Effect();
 	}
 
 	public void Start_UI()
@@ -441,57 +447,145 @@ public class UI_Setting_S : MonoBehaviour
 	
 	public void House(int land_type) // 1: 일반땅, 2: 축제땅
     {
-		//현재 턴이 누구냐에 따라 색 변환하게.
+		//추가사항) 1. 현재 턴이 누구냐에 따라 색 변환하게. 2.시간 남으면 건물 올리기 애니메이션
 
 		int land_number = GameObject.Find("Player_1").GetComponent<Player_S>().stop_land_number;
 
-		if (land_type == 1)
+		if (land_type == 1) //house
 		{
 			Land_House[land_number] = Instantiate(house_prefabs);
+			Land_House[land_number].transform.position = GameObject.Find(land_number.ToString()).transform.position;
+
+			if (GameObject.Find(land_number.ToString()).tag == "SummerWinter")
+			{
+				Land_House[land_number].transform.position = new Vector3(Land_House[land_number].transform.position.x - 0.845f, 0.5f, Land_House[land_number].transform.position.z);
+				Land_House[land_number].transform.Rotate(new Vector3(0, 270, 0)); // 봄가을과 건물이 바라보는 방향이 다름.
+			}
+			else if (GameObject.Find(land_number.ToString()).tag == "SpringFall")
+			{
+				Land_House[land_number].transform.position = new Vector3(Land_House[land_number].transform.position.x, 0.5f, Land_House[land_number].transform.position.z + 0.902f);
+			}
+
+			for (int i = 0; i < 3; i++) //3번재 건물까지는 그냥 올림
+			{
+				if (Land_House_Buy[i] == true)
+				{
+					Land_House[land_number].transform.GetChild(i).gameObject.SetActive(true);
+				}
+			}
+			if (Land_House_Buy[3] == true) //4번째 건물은 나머지 건물 다 없어지고 등장
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					Land_House[land_number].transform.GetChild(i).gameObject.SetActive(false);
+
+				}
+				Land_House[land_number].transform.GetChild(3).gameObject.SetActive(true);
+			}
 		}
-		else if (land_type == 2)
+		else if (land_type == 2) //flag
 		{
 			Land_House[land_number] = Instantiate(festival_prefabs);
-		}
+			Land_House[land_number].transform.position = GameObject.Find(land_number.ToString()).transform.position;
+			if (GameObject.Find(land_number.ToString()).tag == "Festival_SummerWinter")
+			{
+				Land_House[land_number].transform.position = new Vector3(Land_House[land_number].transform.position.x - 0.845f, 0.5f, Land_House[land_number].transform.position.z);
+				Land_House[land_number].transform.Rotate(new Vector3(0, 270, 0));
+			}
+			else if (GameObject.Find(land_number.ToString()).tag == "Festival_SpringFall")
+			{
+				Land_House[land_number].transform.position = new Vector3(Land_House[land_number].transform.position.x, 0.5f, Land_House[land_number].transform.position.z + 0.902f);
+			}
 
-		Land_House[land_number].transform.position = GameObject.Find(land_number.ToString()).transform.position;
-
-		if(GameObject.Find(land_number.ToString()).tag == "SummerWinter")
-        {
-			Land_House[land_number].transform.position = new Vector3(Land_House[land_number].transform.position.x - 0.845f, 0.5f, Land_House[land_number].transform.position.z );
-			Land_House[land_number].transform.Rotate(new Vector3(0, 270, 0)); // 봄가을과 건물이 바라보는 방향이 다름.
-		}
-		else if (GameObject.Find(land_number.ToString()).tag == "SpringFall")
-        {
-			Land_House[land_number].transform.position = new Vector3(Land_House[land_number].transform.position.x, 0.5f, Land_House[land_number].transform.position.z + 0.902f );
-		}
-		else if (GameObject.Find(land_number.ToString()).tag == "Festival_SummerWinter")
-        {
-			Land_House[land_number].transform.position = new Vector3(Land_House[land_number].transform.position.x - 0.845f, 0.5f, Land_House[land_number].transform.position.z);
-			Land_House[land_number].transform.Rotate(new Vector3(0, 270, 0));
-		}
-		else if (GameObject.Find(land_number.ToString()).tag == "Festival_SpringFall")
-		{
-			Land_House[land_number].transform.position = new Vector3(Land_House[land_number].transform.position.x, 0.5f, Land_House[land_number].transform.position.z + 0.902f);
+			Land_House[land_number].transform.GetChild(0).gameObject.SetActive(true);
+			Land_House[land_number].transform.GetChild(1).gameObject.SetActive(true);
 		}
 
 		
-		for (int i=0; i<3; i++)
-        {
-			if(Land_House_Buy[i] == true)
-            {
-				Land_House[land_number].transform.GetChild(i).gameObject.SetActive(true);
-			}
-        }
-		if(Land_House_Buy[3] == true)
-        {
-			for (int i = 0; i < 3; i++)
-			{
-				Land_House[land_number].transform.GetChild(i).gameObject.SetActive(false);
-				
-			}
-			Land_House[land_number].transform.GetChild(3).gameObject.SetActive(true);
-		}
 
 	}
+	
+	public void Season_Effect()
+    {
+		int land_number = GameObject.Find("Player_1").GetComponent<Player_S>().stop_land_number;
+		Debug.Log("들어옴?");
+		if (state == false)
+		{
+			if (land_number == 3)
+			{
+				Debug.Log("들어옴?!!");
+				GameObject.Find("SeasonEffect").transform.GetChild(0).gameObject.SetActive(true);
+			}
+			else if (land_number == 12)
+			{
+				GameObject.Find("SeasonEffect").transform.GetChild(1).gameObject.SetActive(true);
+			}
+			else if (land_number == 23)
+			{
+				GameObject.Find("SeasonEffect").transform.GetChild(2).gameObject.SetActive(true);
+			}
+			else if (land_number == 28)
+			{
+				GameObject.Find("SeasonEffect").transform.GetChild(3).gameObject.SetActive(true);
+			}
+			Debug.Log("1f");
+			StartCoroutine(Delay_2());
+		}
+		
+		
+		if (state == true) {
+			Debug.Log("??");
+			if (land_number == 3)
+			{
+				GameObject.Find("SeasonEffect").transform.GetChild(0).gameObject.SetActive(false);
+			}
+			else if (land_number == 12)
+			{
+				GameObject.Find("SeasonEffect").transform.GetChild(1).gameObject.SetActive(false);
+			}
+			else if (land_number == 23)
+			{
+				GameObject.Find("SeasonEffect").transform.GetChild(2).gameObject.SetActive(false);
+			}
+			else if (land_number == 28)
+			{
+				GameObject.Find("SeasonEffect").transform.GetChild(3).gameObject.SetActive(false);
+			}
+			Debug.Log("3f");
+		}
+	}
+
+	IEnumerator Delay_2()
+	{
+
+		yield return new WaitForSeconds(3f); // 해당 시간동안 기다림
+		Debug.Log("코루틴");
+		state = true;
+		Season_Effect();
+	}
+
+	public void Victory(int n)
+    {
+		GameObject.Find("End").transform.GetChild(0).gameObject.SetActive(true);
+        if (n == 1) //파산승리
+        {
+			Victory_Image.sprite = Buy_images[37];
+        }
+		else if (n == 2) //계절독점승리
+        {
+			Victory_Image.sprite = Buy_images[38];
+		}
+		else if (n == 3) //전국여행승리
+		{
+			Victory_Image.sprite = Buy_images[39];
+		}
+		else if (n == 4) //턴승리
+		{
+			Victory_Image.sprite = Buy_images[40];
+		}
+		Fireworkss_On();
+	}
+	
+
+
 }
