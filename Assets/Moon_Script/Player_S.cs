@@ -28,7 +28,6 @@ public class Player_S : MonoBehaviour
 
 	void Update()
 	{
-
 		Player_Move();
 		Stop_Check();
 	}
@@ -37,7 +36,7 @@ public class Player_S : MonoBehaviour
 	public void Dice_RoLL()
 	{
 		//total_number
-		dice_number = Random.Range(1 ,2);
+		dice_number = Random.Range(12 ,13);
 		Debug.Log("--던짐 주사위수---:" + dice_number);
 		stop_land_number += dice_number;
 		if (stop_land_number > 31)
@@ -85,13 +84,20 @@ public class Player_S : MonoBehaviour
 	{
 		if (col.tag == "0" || col.tag == "8" || col.tag == "16" || col.tag == "24")
 		{
-			//Debug.Log("회전해라");
+			Debug.Log("회전해라");
 			this.transform.Rotate(new Vector3(0, 90, 0));
 		}
-		if(col.tag == "money")
+		else if(col.tag == "money") //월급.
         {
-			//
-			//my_money += 1000000;
+			Debug.Log("돈1");
+			GameObject money = GameObject.Find("Start_Money").transform.GetChild(0).gameObject;
+			money.SetActive(true);
+			money.transform.Translate(new Vector3(-4,3,0) * Time.deltaTime);
+			if(money.transform.position.x == -40)
+            {
+				Debug.Log("돈2");
+				money.SetActive(false);
+            }
         }
 	}
 

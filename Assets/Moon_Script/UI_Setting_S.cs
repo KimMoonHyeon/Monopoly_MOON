@@ -92,9 +92,12 @@ public class UI_Setting_S : MonoBehaviour
 		state = false;
 		state_time = 0f;
 		//집 버튼 눌렀을 때 체크 버튼 false로, 인수할 때도 마찬가지로
-		GameObject.Find("house_1").transform.GetChild(0).gameObject.SetActive(false);
-		GameObject.Find("house_2").transform.GetChild(0).gameObject.SetActive(false);
-		GameObject.Find("house_3").transform.GetChild(0).gameObject.SetActive(false);
+		if(GameObject.Find("house_1").transform.GetChild(0).gameObject.activeSelf == true)
+			GameObject.Find("house_1").transform.GetChild(0).gameObject.SetActive(false);
+		if (GameObject.Find("house_2").transform.GetChild(0).gameObject.activeSelf == true)
+			GameObject.Find("house_2").transform.GetChild(0).gameObject.SetActive(false);
+		if (GameObject.Find("house_3").transform.GetChild(0).gameObject.activeSelf == true)
+			GameObject.Find("house_3").transform.GetChild(0).gameObject.SetActive(false);
 
 		//Buy_Image false
 		UI_Ob.transform.GetChild(0).gameObject.SetActive(false);
@@ -216,7 +219,7 @@ public class UI_Setting_S : MonoBehaviour
 				Debug.Log(-buy_sum);
 			}
 		}
-		Buy_text.GetComponent<Text>().text = buy_sum.ToString();		
+		Buy_text.GetComponent<Text>().text = buy_sum.ToString();
 	}
 
 	public void Buy_Butoon()
@@ -231,9 +234,10 @@ public class UI_Setting_S : MonoBehaviour
 
 		my_money -= buy_sum;
 		buy_sum = 0;
-		//Player_money.GetComponent<Text>().text = my_money.ToString();
+		Player_money.GetComponent<Text>().text = my_money.ToString();
 		House(1);
-		Victory(3);
+		GameObject.Find("Start_Money").transform.GetChild(0).gameObject.SetActive(true);
+		//Victory(3);
 	}
 
 	public void Festival_Buy_Button()
@@ -586,6 +590,15 @@ public class UI_Setting_S : MonoBehaviour
 		Fireworkss_On();
 	}
 	
+	public void Player1_Trace_Button()
+    {
+
+    }
+
+	public void Player2_Trace_Button()
+	{
+
+	}
 
 
 }
