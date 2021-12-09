@@ -36,7 +36,7 @@ public class Player_S : MonoBehaviour
 	public void Dice_RoLL()
 	{
 		//total_number
-		dice_number = Random.Range(12 ,13);
+		dice_number = Random.Range(1 ,5);
 		Debug.Log("--던짐 주사위수---:" + dice_number);
 		stop_land_number += dice_number;
 		if (stop_land_number > 31)
@@ -45,6 +45,9 @@ public class Player_S : MonoBehaviour
 		}
 		UI_Buy_bool = true;
 		Debug.Log("스탑랜드:" + stop_land_number);
+
+		GameObject.Find("UI_Setting").GetComponent<UI_Setting_S>().Gone_Land[stop_land_number] = true; 
+
 	}
 
 	//주사위 나온 수만큼 player 이동

@@ -17,6 +17,7 @@ public class UI_Setting_S : MonoBehaviour
 	public bool HighPassOK;
 	public bool IncreasePoint;
 	public bool IncreaseOK;
+	public bool gone_land;
 	public int Golden_Key_number;
 	GameObject UI_Ob;
 	GameObject Player_1;
@@ -34,25 +35,32 @@ public class UI_Setting_S : MonoBehaviour
 	public GameObject[] Land_House;
 	public GameObject house_prefabs;
 	public GameObject festival_prefabs;
+	public GameObject Money;
 	public bool[] Land_House_Buy;
+	public bool[] Gone_Land;
+	public bool money;
 	Coroutine mycor1;
 
 	void Start()
 	{
-
+		Money = GameObject.Find("Player_Window").transform.GetChild(0).gameObject;
 		my_money = 3000000;
 		land_money = new int[4] { 1, 2, 3, 4 };
 		Land_House_Buy = new bool[4] { false, false, false, false};
 		Land_House = new GameObject[32];
-
+		Gone_Land = new bool[32];
 		UI_Ob = GameObject.Find("UI");
 		Player_1 = GameObject.Find("Player_1");
-
 		buy_sum = 0;
 		state_time = 0f;
-
+		gone_land = false;
 		HighPassPoint = false;
 		IncreasePoint = false;
+
+		for(int i=0; i<32; i++)
+        {
+			Gone_Land[i] = false;
+        }
 	}
 
 	void Update()
@@ -60,6 +68,8 @@ public class UI_Setting_S : MonoBehaviour
 		if (state) { 
 			State();
 		}
+
+		Money_position();
 	}
 
 	//땅에 도착했을 때 UI 등장까지 잠시 state
@@ -70,6 +80,25 @@ public class UI_Setting_S : MonoBehaviour
     }
 
 	//구매 UI
+	public void Money_position() // 1 = 구매(내 위치->가운데) , 2 = 인수(내 위치-> 상대 위치) ,3 = (가운데 -> 내 위치) 
+    {
+		/*
+		if () {
+			if (p == 1)
+			{
+
+			}
+			else if (p == 2)
+			{
+
+			}
+			else if (p == 3)
+			{
+
+			}
+		}*/
+    }
+
 	public void Normal_Land_Buy_UI()
 	{
 		
@@ -236,7 +265,11 @@ public class UI_Setting_S : MonoBehaviour
 		buy_sum = 0;
 		Player_money.GetComponent<Text>().text = my_money.ToString();
 		House(1);
-		GameObject.Find("Start_Money").transform.GetChild(0).gameObject.SetActive(true);
+
+		Money.SetActive(true);
+		Money.transform.position = new Vector3(-35, 25, 0);
+		Money.transform.position = Vector3.MoveTowards(Money.transform.position, new Vector3(0,0,0), Time.deltaTime * 8f);
+
 		//Victory(3);
 	}
 
@@ -378,8 +411,6 @@ public class UI_Setting_S : MonoBehaviour
 				Player_1.GetComponent<Player_S>().stop_land_number = int.Parse(hit.transform.gameObject.name);
 				HighPassPoint = false;
 
-
-
 				for (int i = 0; i < 3; i++)
 				{
 					Child_Layer_Chage(GameObject.Find("Map_Obj").transform.GetChild(i), 0);
@@ -504,9 +535,6 @@ public class UI_Setting_S : MonoBehaviour
 			Land_House[land_number].transform.GetChild(0).gameObject.SetActive(true);
 			Land_House[land_number].transform.GetChild(1).gameObject.SetActive(true);
 		}
-
-		
-
 	}
 	
 	public void Season_Effect()
@@ -589,16 +617,37 @@ public class UI_Setting_S : MonoBehaviour
 		}
 		Fireworkss_On();
 	}
-	
-	public void Player1_Trace_Button()
-    {
 
-    }
-
-	public void Player2_Trace_Button()
+	public void Gone_land_f() //하이패스에서도 잘 들어가는지 확인할 것.
 	{
+		if (gone_land == false) //gone_land가 false인 상태에서 버튼 클릭시 보여주기
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				Child_Layer_Chage(GameObject.Find("Map_Obj").transform.GetChild(i), 8);
+
+			}
+			for(int i=0; i< 32; i++)
+            {
+				if(Gone_Land[i] == true && i != 0 && i != 8 && i != 16 && i != 24 && i != 3 && i != 12 && i != 23 && i != 28
+					&& i != 5 && i != 14 && i != 20 && i != 27)
+                {
+					GameObject.Find(i.ToString()).layer = 0;
+				}
+            }
+
+			gone_land = true;
+		}
+		else if(gone_land == true)
+        {
+			for (int i = 0; i < 3; i++)
+			{
+				Child_Layer_Chage(GameObject.Find("Map_Obj").transform.GetChild(i), 0);
+
+			}
+			gone_land = false;
+		}
 
 	}
-
-
+	
 }
