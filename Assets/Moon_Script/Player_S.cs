@@ -36,7 +36,7 @@ public class Player_S : MonoBehaviour
 	public void Dice_RoLL()
 	{
 		//total_number
-		dice_number = Random.Range(1 ,5);
+		dice_number = Random.Range(8 ,9);
 		Debug.Log("--던짐 주사위수---:" + dice_number);
 		stop_land_number += dice_number;
 		if (stop_land_number > 31)

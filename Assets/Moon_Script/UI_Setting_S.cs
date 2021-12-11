@@ -38,12 +38,14 @@ public class UI_Setting_S : MonoBehaviour
 	public GameObject Money;
 	public bool[] Land_House_Buy;
 	public bool[] Gone_Land;
-	public bool money;
-	Coroutine mycor1;
+	public int money_number;
+	bool accident;
+	private IEnumerator accident_cor;
 
 	void Start()
 	{
-		Money = GameObject.Find("Player_Window").transform.GetChild(0).gameObject;
+		
+	    Money = GameObject.Find("Player_Window").transform.GetChild(0).gameObject;
 		my_money = 3000000;
 		land_money = new int[4] { 1, 2, 3, 4 };
 		Land_House_Buy = new bool[4] { false, false, false, false};
@@ -56,8 +58,8 @@ public class UI_Setting_S : MonoBehaviour
 		gone_land = false;
 		HighPassPoint = false;
 		IncreasePoint = false;
-
-		for(int i=0; i<32; i++)
+		accident = false;
+		for (int i=0; i<32; i++)
         {
 			Gone_Land[i] = false;
         }
@@ -69,7 +71,7 @@ public class UI_Setting_S : MonoBehaviour
 			State();
 		}
 
-		Money_position();
+		Money_position(money_number);
 	}
 
 	//땅에 도착했을 때 UI 등장까지 잠시 state
@@ -80,23 +82,29 @@ public class UI_Setting_S : MonoBehaviour
     }
 
 	//구매 UI
-	public void Money_position() // 1 = 구매(내 위치->가운데) , 2 = 인수(내 위치-> 상대 위치) ,3 = (가운데 -> 내 위치) 
+	public void Money_position(int p) // 1 = 구매(내 위치->가운데) , 2 = 인수(내 위치-> 상대 위치) ,3 = (가운데 -> 내 위치) 
     {
-		/*
-		if () {
-			if (p == 1)
-			{
-
+	
+		if (p == 1)
+		{
+			Debug.Log("1 들어옴!");
+			Money.SetActive(true);
+			Money.transform.position = Vector3.MoveTowards(Money.transform.position, new Vector3(0, 0, 0), Time.deltaTime * 0.3f);
+			Debug.Log(Money.transform.position);
+			if (Money.transform.position == new Vector3(0, 0, 0))
+            {
+				money_number = 0;
+				Money.SetActive(false);
 			}
-			else if (p == 2)
-			{
+		}
+		else if (p == 2)
+		{
 
-			}
-			else if (p == 3)
-			{
+		}
+		else if (p == 3)
+		{
 
-			}
-		}*/
+		}
     }
 
 	public void Normal_Land_Buy_UI()
@@ -154,7 +162,7 @@ public class UI_Setting_S : MonoBehaviour
 		state_time = 0f;
 		UI_Ob.transform.GetChild(3).gameObject.SetActive(false);
 		Player_1.GetComponent<Player_S>().UI_Buy_bool = false;
-
+		StopCoroutine(accident_cor);
 		//이제 상대 턴으로 넘겨주는 함수?
 
 	}
@@ -266,9 +274,7 @@ public class UI_Setting_S : MonoBehaviour
 		Player_money.GetComponent<Text>().text = my_money.ToString();
 		House(1);
 
-		Money.SetActive(true);
-		Money.transform.position = new Vector3(-35, 25, 0);
-		Money.transform.position = Vector3.MoveTowards(Money.transform.position, new Vector3(0,0,0), Time.deltaTime * 8f);
+		money_number = 1;
 
 		//Victory(3);
 	}
@@ -296,35 +302,49 @@ public class UI_Setting_S : MonoBehaviour
 
 	public void Accident_UI() //8번 지역에 도착하면 차가 달려와서 교통사고 나고 layer 바뀌어서 조명 8번에만 비추고 UI 출력
 	{
+		//if(!accident)
+		accident_cor = Accident_cor();
+		Debug.Log("코루틴");
+		StartCoroutine(accident_cor);
+		
+	}
+	
+    IEnumerator Accident_cor()
+    {
+
+		Debug.Log("코루틴!");
 		GameObject Accident_car = GameObject.Find("Accident_car_parent").transform.GetChild(0).gameObject;
 		Accident_car.SetActive(true);
-		Accident_car.transform.position = Vector3.MoveTowards(Accident_car.transform.position, Player_1.transform.position, Time.deltaTime * 8f);
-		if(Accident_car.transform.position == Player_1.transform.position)
-        {
-			Debug.Log("꽝!");
-			state = true;
-			if (state_time > 0.5f)
+
+		while (true)
+		{	
+
+			if (Accident_car.transform.position == Player_1.transform.position)
 			{
-				for(int i=0; i<3; i++)
-                {
+				for (int i = 0; i < 3; i++)
+				{
 					Accident_car.SetActive(false);
 					Child_Layer_Chage(GameObject.Find("Map_Obj").transform.GetChild(i), 8);
 
-                }
+				}
 				GameObject.Find("8").gameObject.layer = 0;
 				UI_Ob.transform.GetChild(3).gameObject.SetActive(true);
-
+				Debug.Log("옹");
+				Accident_car.transform.position = new Vector3(-22,0,-7);
+				Accident_car.SetActive(false);
+				yield return null;
 			}
-			/*
-			 if 횟수 2번이 끝나면
-			  layer = 0으로 다 돌려놓을 것.
-			 * 
-			 */
-			
-			Accident_car.SetActive(false);
-        }
+            else
+            {
+				Accident_car.transform.position = Vector3.MoveTowards(Accident_car.transform.position, Player_1.transform.position, Time.deltaTime * 1f);
+			}
+			yield return new WaitForSecondsRealtime(0.0f);
+
+		}
 	}
 	
+	
+
 	void Child_Layer_Chage(Transform parent, int layer_number) //자식 오브젝트의 모든 layer 변경
     {
 		parent.gameObject.layer = layer_number;
@@ -587,15 +607,6 @@ public class UI_Setting_S : MonoBehaviour
 		}
 	}
 
-	IEnumerator Delay_2()
-	{
-
-		yield return new WaitForSeconds(3f); // 해당 시간동안 기다림
-		Debug.Log("코루틴");
-		state = true;
-		Season_Effect();
-	}
-
 	public void Victory(int n)
     {
 		GameObject.Find("End").transform.GetChild(0).gameObject.SetActive(true);
@@ -649,5 +660,26 @@ public class UI_Setting_S : MonoBehaviour
 		}
 
 	}
-	
+
+	//코루틴 지역
+
+	IEnumerator Delay_2() //seasondeffect
+	{
+
+		yield return new WaitForSeconds(3f); // 해당 시간동안 기다림
+		Debug.Log("코루틴");
+		state = true;
+		Season_Effect();
+	}
+	/*
+	IEnumerator Delay_2() //교통사고
+	{
+
+		yield return new WaitForSeconds(3f); // 해당 시간동안 기다림
+		Debug.Log("코루틴");
+		state = true;
+		Season_Effect();
+	}*/
+
+
 }
