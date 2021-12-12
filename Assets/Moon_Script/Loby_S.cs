@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class Loby_S : MonoBehaviour {
 
@@ -11,14 +12,31 @@ public class Loby_S : MonoBehaviour {
 	public Image Background_image;
 	public Image Background_image_Box;
 	public Image Explain_images;
+	public Slider backVolume;
+	public Slider backVolume2;
+	public AudioSource audio_;
+	public AudioSource audio_2;
+	private float backVol = 1f;
+	private float backVol2 = 1f;
 	int spring_num, summer_sum, fall_num, winter_num;
 	int explain_page;
 	bool spring_b, summer_b, fall_b, winter_b;
 	private IEnumerator box_cor;
-
+	AudioSource click_audio;
+	AudioSource page_audio;
 	void Start () {
-		box_cor = Box_cor();
 
+		click_audio = GameObject.Find("Audio_Setting").GetComponent<AudioSource>();
+		page_audio = GameObject.Find("Audio_page").GetComponent<AudioSource>();
+		backVol = PlayerPrefs.GetFloat("backvol", 1f);
+		backVolume.value = backVol;
+		audio_.volume = backVolume.value;
+
+		backVol2 = PlayerPrefs.GetFloat("backvol2", 2f);
+		backVolume2.value = backVol2;
+		audio_2.volume = backVolume2.value;
+
+		box_cor = Box_cor();
 		explain_page = 0;
 		spring_num = 0;
 		summer_sum = 5;
@@ -32,12 +50,25 @@ public class Loby_S : MonoBehaviour {
 	}
 	
 	void Update () {
-		
+		SoundSlider();
+		SoundSlider2();
 	}
-
+	public void SoundSlider()
+    {
+		audio_.volume = backVolume.value;
+		backVol = backVolume.value;
+		PlayerPrefs.SetFloat("backvol", backVol);
+    }
+	public void SoundSlider2()
+	{
+		audio_2.volume = backVolume2.value;
+		backVol2 = backVolume2.value;
+		PlayerPrefs.SetFloat("backvol2", backVol2);
+	}
 
 	public void Loaby_Message()
     {
+		
 		GameObject.Find("Background").GetComponent<Image>().color =new Color (80f/255f, 80f/255f, 80f/255f);
 		for(int i=0; i<=7; i++)
         {
@@ -49,6 +80,7 @@ public class Loby_S : MonoBehaviour {
 
 	public void OK_1()
     {
+		click_audio.Play();
 		GameObject.Find("Explain").GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
 		GameObject.Find("Loby_explain").transform.GetChild(0).gameObject.SetActive(false);
 
@@ -57,6 +89,7 @@ public class Loby_S : MonoBehaviour {
 	}
 	public void OK_2()
 	{
+		click_audio.Play();
 		GameObject.Find("Start").GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
 		GameObject.Find("Loby_explain").transform.GetChild(1).gameObject.SetActive(false);
 
@@ -69,6 +102,7 @@ public class Loby_S : MonoBehaviour {
 	}
 	public void OK_3()
 	{
+		click_audio.Play();
 		GameObject.Find("Spring").GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
 		GameObject.Find("Summer").GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
 		GameObject.Find("Fall").GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
@@ -80,6 +114,7 @@ public class Loby_S : MonoBehaviour {
 	}
 	public void OK_4()
 	{
+		click_audio.Play();
 		GameObject.Find("Exit").GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
 		GameObject.Find("Loby_explain").transform.GetChild(3).gameObject.SetActive(false);
 
@@ -90,6 +125,7 @@ public class Loby_S : MonoBehaviour {
 	}
 	public void OK_5()
 	{
+		click_audio.Play();
 		GameObject.Find("Loby_explain").transform.GetChild(4).gameObject.SetActive(false);
 		GameObject.Find("Background").GetComponent<Image>().color = new Color(255f / 255f, 255f / 255f, 255f / 255f);
 		for (int i = 0; i < 7; i++)
@@ -111,6 +147,7 @@ public class Loby_S : MonoBehaviour {
 	// 배경 바꾸기
 	public void Spring_Change()
     {
+		click_audio.Play();
 		if (!spring_b)
 		{
 			Background_image_Box.transform.localScale = new Vector3(0f, 0f, 0f);
@@ -128,6 +165,7 @@ public class Loby_S : MonoBehaviour {
 	}
 	public void Summer_Change()
 	{
+		click_audio.Play();
 		if (!summer_b)
 		{
 			Background_image_Box.transform.localScale = new Vector3(0f, 0f, 0f);
@@ -144,6 +182,7 @@ public class Loby_S : MonoBehaviour {
 	}
 	public void Fall_Change()
 	{
+		click_audio.Play();
 		if (!fall_b)
 		{
 			Background_image_Box.transform.localScale = new Vector3(0f, 0f, 0f);
@@ -160,6 +199,7 @@ public class Loby_S : MonoBehaviour {
 	}
 	public void Winter_Change()
 	{
+		click_audio.Play();
 		if (!winter_b)
 		{
 			Background_image_Box.transform.localScale = new Vector3(0f, 0f, 0f);
@@ -197,17 +237,19 @@ public class Loby_S : MonoBehaviour {
 	//게임 설명
 	public void Explain_On()
     {
+		click_audio.Play();
 		GameObject.Find("Canvas3").transform.GetChild(0).gameObject.SetActive(true);
 		Explain_images.sprite = Setting_images[20];
 		
     }
 	public void Explain_Off()
 	{
+		click_audio.Play();
 		GameObject.Find("Canvas3").transform.GetChild(0).gameObject.SetActive(false);
 	}
 	public void Explain_next()
 	{
-	
+		page_audio.Play();
 		explain_page++;
 		Debug.Log(explain_page);
 		Explain_images.sprite = Setting_images[20 + explain_page];
@@ -222,6 +264,7 @@ public class Loby_S : MonoBehaviour {
 	}
 	public void Explain_before()
 	{
+		page_audio.Play();
 		if (explain_page <= 10)
 		{
 			GameObject.Find("Game_explain").transform.GetChild(1).gameObject.SetActive(true);
@@ -237,18 +280,31 @@ public class Loby_S : MonoBehaviour {
 	//게임종료
 	public void Game_Exit()
 	{
+		click_audio.Play();
 		GameObject.Find("Canvas3").transform.GetChild(1).gameObject.SetActive(true);
 	}
 
 	public void Game_Exit_On()
 	{
-        Application.Quit(); //다시 확인해야함---------------------------------------------------------------------------------
+		click_audio.Play();
+		Application.Quit(); //다시 확인해야함---------------------------------------------------------------------------------
 	}
 	public void Game_Exit_Off()
 	{
+		click_audio.Play();
 		GameObject.Find("Canvas3").transform.GetChild(1).gameObject.SetActive(false);
 	}
-
-
+	public void setting_On()
+	{
+		GameObject.Find("Loby_setting").transform.GetChild(0).gameObject.SetActive(true);
+	}
+	public void setting_X()
+    {
+		GameObject.Find("Loby_setting").transform.GetChild(0).gameObject.SetActive(false);
+	}
+	public void Start_to_Main()
+    {
+		SceneManager.LoadScene("Main");
+	}
 
 }
