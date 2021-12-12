@@ -28,10 +28,84 @@ public class Loby_S : MonoBehaviour {
 		summer_b = false;
 		fall_b = false;
 		winter_b = false;
+		Loaby_Message();
 	}
 	
 	void Update () {
 		
+	}
+
+
+	public void Loaby_Message()
+    {
+		GameObject.Find("Background").GetComponent<Image>().color =new Color (80f/255f, 80f/255f, 80f/255f);
+		for(int i=0; i<=7; i++)
+        {
+			GameObject.Find("Canvas2").transform.GetChild(i).GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
+		}
+		GameObject.Find("Loby_explain").transform.GetChild(0).gameObject.SetActive(true);
+		GameObject.Find("Explain").GetComponent<Image>().color = new Color(255f / 255f, 255f / 255f, 255f / 255f);
+	}
+
+	public void OK_1()
+    {
+		GameObject.Find("Explain").GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
+		GameObject.Find("Loby_explain").transform.GetChild(0).gameObject.SetActive(false);
+
+		GameObject.Find("Loby_explain").transform.GetChild(1).gameObject.SetActive(true);
+		GameObject.Find("Start").GetComponent<Image>().color = new Color(255f / 255f, 255f / 255f, 255f / 255f);
+	}
+	public void OK_2()
+	{
+		GameObject.Find("Start").GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
+		GameObject.Find("Loby_explain").transform.GetChild(1).gameObject.SetActive(false);
+
+		GameObject.Find("Loby_explain").transform.GetChild(2).gameObject.SetActive(true);
+
+		GameObject.Find("Spring").GetComponent<Image>().color = new Color(255f / 255f, 255f / 255f, 255f / 255f);
+		GameObject.Find("Summer").GetComponent<Image>().color = new Color(255f / 255f, 255f / 255f, 255f / 255f);
+		GameObject.Find("Fall").GetComponent<Image>().color = new Color(255f / 255f, 255f / 255f, 255f / 255f);
+		GameObject.Find("Winter").GetComponent<Image>().color = new Color(255f / 255f, 255f / 255f, 255f / 255f);
+	}
+	public void OK_3()
+	{
+		GameObject.Find("Spring").GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
+		GameObject.Find("Summer").GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
+		GameObject.Find("Fall").GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
+		GameObject.Find("Winter").GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
+		GameObject.Find("Loby_explain").transform.GetChild(2).gameObject.SetActive(false);
+
+		GameObject.Find("Loby_explain").transform.GetChild(3).gameObject.SetActive(true);
+		GameObject.Find("Exit").GetComponent<Image>().color = new Color(255f / 255f, 255f / 255f, 255f / 255f);
+	}
+	public void OK_4()
+	{
+		GameObject.Find("Exit").GetComponent<Image>().color = new Color(80f / 255f, 80f / 255f, 80f / 255f);
+		GameObject.Find("Loby_explain").transform.GetChild(3).gameObject.SetActive(false);
+
+		GameObject.Find("Setting").GetComponent<Image>().color = new Color(255f / 255f, 255f / 255f, 255f / 255f);
+		GameObject.Find("Loby_explain").transform.GetChild(4).gameObject.SetActive(true);
+
+		
+	}
+	public void OK_5()
+	{
+		GameObject.Find("Loby_explain").transform.GetChild(4).gameObject.SetActive(false);
+		GameObject.Find("Background").GetComponent<Image>().color = new Color(255f / 255f, 255f / 255f, 255f / 255f);
+		for (int i = 0; i < 7; i++)
+		{
+			GameObject.Find("Canvas2").transform.GetChild(i).GetComponent<Image>().color = new Color(255f / 255f, 255f / 255f, 255f / 255f);
+		}
+	}
+
+
+	void Child_Layer_Chage(Transform parent, int layer_number) //자식 오브젝트의 모든 layer 변경
+	{
+		parent.gameObject.layer = layer_number;
+		foreach (Transform child in parent)
+		{
+			Child_Layer_Chage(child, layer_number);
+		}
 	}
 
 	// 배경 바꾸기

@@ -41,7 +41,7 @@ public class UI_Setting_S : MonoBehaviour
 	bool accident;
 	private IEnumerator accident_cor;
 	private GameObject Map_Obj;
-
+	/*
 	void Awake()
     {
 		Map_Creation();
@@ -49,7 +49,7 @@ public class UI_Setting_S : MonoBehaviour
 		Invoke("Start", 4f);
 		Invoke("Update", 4f);
 	}
-
+	*/
 	void Start()
 	{
 
@@ -73,6 +73,7 @@ public class UI_Setting_S : MonoBehaviour
 			Gone_Land[i] = false;
         }
 		Debug.Log("to");
+		Money_position(1);
 	}
 
 
@@ -187,6 +188,7 @@ public class UI_Setting_S : MonoBehaviour
 		GameObject money_obj = GameObject.Find("Player_Window").transform.GetChild(0).gameObject;
 		GameObject take_obj = GameObject.Find("Player_Window").transform.GetChild(1).gameObject;
 		bool take = false;
+		//아래쪽 기준
 		if (p == 1 || p == 2 || p == 3)
 		{
 			money_obj.gameObject.SetActive(true);
@@ -680,13 +682,6 @@ public class UI_Setting_S : MonoBehaviour
 		}
 	}
 
-	public void Fireworkss_On()
-    {
-		for (int i = 0; i < 11; i++)
-		{
-			GameObject.Find("Fireworks").gameObject.transform.GetChild(i).gameObject.SetActive(true);
-		}
-    }
 
 	public void End_Button()
     {
@@ -819,9 +814,15 @@ public class UI_Setting_S : MonoBehaviour
 		{
 			Victory_Image.sprite = Buy_images[40];
 		}
-		Fireworkss_On();
+		Fireworks_On();
 	}
-
+	public void Fireworks_On()
+	{
+		for (int i = 0; i < 11; i++)
+		{
+			GameObject.Find("Fireworks").gameObject.transform.GetChild(i).gameObject.SetActive(true);
+		}
+	}
 	public void Gone_land_f() //하이패스에서도 잘 들어가는지 확인할 것.
 	{
 		if (gone_land == false) //gone_land가 false인 상태에서 버튼 클릭시 보여주기
