@@ -36,7 +36,7 @@ public class Player_S : MonoBehaviour
 	public void Dice_RoLL()
 	{
 		//total_number
-		dice_number = Random.Range(8 ,9);
+		dice_number = Random.Range(25 ,26);
 		Debug.Log("--던짐 주사위수---:" + dice_number);
 		stop_land_number += dice_number;
 		if (stop_land_number > 31)
@@ -114,7 +114,7 @@ public class Player_S : MonoBehaviour
 			{
 				if (stop_land_number == 0) //시작지역
 				{
-					GameObject.Find("UI_Setting").GetComponent<UI_Setting_S>().Start_UI();
+					//GameObject.Find("UI_Setting").GetComponent<UI_Setting_S>().Start_UI();
 				}
 				else if (stop_land_number == 8) //사고지역
 				{

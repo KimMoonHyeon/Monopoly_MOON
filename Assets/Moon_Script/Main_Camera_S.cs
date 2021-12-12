@@ -14,7 +14,7 @@ public class Main_Camera_S : MonoBehaviour {
 
 		//this.transform.position = new Vector3(36.6f, 52.6f, -34.1f);
 		//this.transform.rotation = new Vector3(39.86f, -45f, 0f);
-
+		time = 3f;
 		initial_pos = this.transform.position;
 		Player = GameObject.Find("Player_1");
 	}

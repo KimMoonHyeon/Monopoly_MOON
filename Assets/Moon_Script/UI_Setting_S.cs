@@ -10,7 +10,6 @@ public class UI_Setting_S : MonoBehaviour
 {
 
 	int stop_land_number;
-
 	float state_time;
 	bool state;
 	public bool HighPassPoint;
@@ -35,17 +34,27 @@ public class UI_Setting_S : MonoBehaviour
 	public GameObject[] Land_House;
 	public GameObject house_prefabs;
 	public GameObject festival_prefabs;
-	public GameObject Money;
+	GameObject Money;
 	public bool[] Land_House_Buy;
 	public bool[] Gone_Land;
 	public int money_number;
 	bool accident;
 	private IEnumerator accident_cor;
+	private GameObject Map_Obj;
+
+	void Awake()
+    {
+		Map_Creation();
+		Debug.Log("go");
+		Invoke("Start", 4f);
+		Invoke("Update", 4f);
+	}
 
 	void Start()
 	{
-		
-	    Money = GameObject.Find("Player_Window").transform.GetChild(0).gameObject;
+
+		Money = GameObject.Find("Window").transform.GetChild(0).gameObject;
+		Map_Obj = GameObject.Find("Map_Obj").gameObject;
 		my_money = 3000000;
 		land_money = new int[4] { 1, 2, 3, 4 };
 		Land_House_Buy = new bool[4] { false, false, false, false};
@@ -63,7 +72,9 @@ public class UI_Setting_S : MonoBehaviour
         {
 			Gone_Land[i] = false;
         }
+		Debug.Log("to");
 	}
+
 
 	void Update()
 	{
@@ -71,8 +82,76 @@ public class UI_Setting_S : MonoBehaviour
 			State();
 		}
 
-		Money_position(money_number);
 	}
+
+	public void Map_Creation()
+    {
+		StartCoroutine(Mao_cor());
+    }
+
+	IEnumerator Mao_cor()
+    {
+		GameObject Sky_Floor = GameObject.Find("Map_Obj").transform.GetChild(0).gameObject;
+		GameObject Wall = GameObject.Find("Map_Obj").transform.GetChild(1).gameObject;
+		GameObject Season_Land = GameObject.Find("Map_Obj").transform.GetChild(2).gameObject;
+		GameObject Event_Land = GameObject.Find("Map_Obj").transform.GetChild(3).gameObject;
+		GameObject Window = GameObject.Find("Window");
+		yield return new WaitForSecondsRealtime(0.05f);
+		Wall.SetActive(true);
+
+		int k = 0;
+		for (int i=0; i<32; i++)
+        {
+            if (i == 0)
+            {
+				Event_Land.transform.GetChild(0).gameObject.SetActive(true);
+            }
+			else if (i == 8)
+            {
+				Event_Land.transform.GetChild(1).gameObject.SetActive(true);
+			}
+			else if (i == 16)
+            {
+				Event_Land.transform.GetChild(2).gameObject.SetActive(true);
+			}
+			else if (i == 24)
+            {
+				Event_Land.transform.GetChild(3).gameObject.SetActive(true);
+			}
+            else
+            {
+				
+				Debug.Log("Seson_Map: " + k);
+				Season_Land.transform.GetChild(k).gameObject.SetActive(true);
+				k++;
+			}
+			Debug.Log("Map: " + i);
+			yield return new WaitForSecondsRealtime(0.05f);
+			
+        }
+
+		yield return new WaitForSecondsRealtime(0.1f);
+
+		while (true)
+		{
+			Sky_Floor.transform.localScale += new Vector3(1.7f, 0.001f, 1.7f);
+
+			if (Sky_Floor.gameObject.transform.localScale.x >= 16.9f)
+			{
+				yield return new WaitForSecondsRealtime(0.1f);
+				Window.transform.GetChild(0).gameObject.SetActive(true);
+				GameObject.Find("Map_Obj").transform.GetChild(4).gameObject.SetActive(true);
+
+				yield break;
+			}
+
+			yield return new WaitForSecondsRealtime(0.05f);
+			
+		}
+
+	
+    }
+
 
 	//땅에 도착했을 때 UI 등장까지 잠시 state
 	void State()
@@ -82,30 +161,141 @@ public class UI_Setting_S : MonoBehaviour
     }
 
 	//구매 UI
-	public void Money_position(int p) // 1 = 구매(내 위치->가운데) , 2 = 인수(내 위치-> 상대 위치) ,3 = (가운데 -> 내 위치) 
+	public void Money_position(int p) // 1 = 구매(내 위치->가운데) , 2 = 인수(내 위치-> 상대 위치) ,3 = (가운데 -> 내 위치) , 4 = 통행료(가운데 -> 상대)
     {
 	
 		if (p == 1)
 		{
-			Debug.Log("1 들어옴!");
-			Money.SetActive(true);
-			Money.transform.position = Vector3.MoveTowards(Money.transform.position, new Vector3(0, 0, 0), Time.deltaTime * 0.3f);
-			Debug.Log(Money.transform.position);
-			if (Money.transform.position == new Vector3(0, 0, 0))
-            {
-				money_number = 0;
-				Money.SetActive(false);
+			StartCoroutine(Money_Cor(1));
+
+		}
+		else if (p == 2)  //자리에 알맞게 Money_position(2)넣어야함
+		{
+			StartCoroutine(Money_Cor(2));
+		}
+		else if (p == 3) ////자리에 알맞게 Money_position(3)넣어야함
+		{
+			StartCoroutine(Money_Cor(3));
+		}
+		else if (p == 4) ////SetActive하는 Gameobject가 다름. 2번이랑 알고리즘은 똑같음. 셋엑티브만 변경. 자리에 알맞게 Money_position(4)넣어야함
+		{
+			StartCoroutine(Money_Cor(4));
+		}
+    }
+	IEnumerator Money_Cor(int p)
+    {
+		GameObject money_obj = GameObject.Find("Player_Window").transform.GetChild(0).gameObject;
+		GameObject take_obj = GameObject.Find("Player_Window").transform.GetChild(1).gameObject;
+		bool take = false;
+		if (p == 1 || p == 2 || p == 3)
+		{
+			money_obj.gameObject.SetActive(true);
+		}
+		else if (p == 4)
+		{
+			
+			take_obj.gameObject.SetActive(true);
+			take= true;
+		}
+		if (p == 1)
+		{
+			money_obj.GetComponent<RectTransform>().anchoredPosition = new Vector3(400, -200);
+			float x1 = money_obj.GetComponent<RectTransform>().anchoredPosition.x;
+			float y1 = money_obj.GetComponent<RectTransform>().anchoredPosition.y;
+			while (true)
+			{
+				
+				if (x1 <= 0)
+				{
+					money_obj.gameObject.SetActive(false);
+					yield break;
+				}
+				else
+				{
+					x1 -= 8f;
+					y1 += 4f;
+					money_obj.GetComponent<RectTransform>().anchoredPosition = new Vector2(x1, y1);
+				}
+				yield return new WaitForSecondsRealtime(0.001f);
 			}
 		}
 		else if (p == 2)
 		{
+			money_obj.GetComponent<RectTransform>().anchoredPosition = new Vector3(400, -200);
+			float x1 = money_obj.GetComponent<RectTransform>().anchoredPosition.x;
+			float y1 = money_obj.GetComponent<RectTransform>().anchoredPosition.y;
+			while (true)
+			{
 
+				if (x1 <= -400)
+				{
+					money_obj.gameObject.SetActive(false);
+					yield break;
+				}
+				else
+				{
+					x1 -= 14f;
+					y1 += 7f;
+					money_obj.GetComponent<RectTransform>().anchoredPosition = new Vector2(x1, y1);
+				}
+				yield return new WaitForSecondsRealtime(0.001f);
+			}
 		}
 		else if (p == 3)
 		{
+			money_obj.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, 0);
+			float x1 = money_obj.GetComponent<RectTransform>().anchoredPosition.x;
+			float y1 = money_obj.GetComponent<RectTransform>().anchoredPosition.y;
+  
+			while (true)
+			{
 
+				if (x1 >= 400)
+				{
+					money_obj.gameObject.SetActive(false);
+					yield break;
+				}
+				else
+				{
+					x1 += 8f;
+					y1 -= 4f;
+					money_obj.GetComponent<RectTransform>().anchoredPosition = new Vector2(x1, y1);
+				}
+				yield return new WaitForSecondsRealtime(0.001f);
+			}
 		}
-    }
+
+		else if (p == 4) //인수할 때 UI 1.5초 동안 보여주기.
+		{
+
+			take_obj.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, 0);
+			float x1 = money_obj.GetComponent<RectTransform>().anchoredPosition.x;
+			float y1 = money_obj.GetComponent<RectTransform>().anchoredPosition.y;
+			if (take == true)
+			{
+				yield return new WaitForSecondsRealtime(1.5f);
+				take = false;
+			}
+			while (true)
+			{
+
+				if (x1 <= -400)
+				{
+					take_obj.gameObject.SetActive(false);
+					yield break;
+				}
+				else
+				{
+					x1 -= 8f;
+					y1 += 4f;
+					take_obj.GetComponent<RectTransform>().anchoredPosition = new Vector2(x1, y1);
+					
+				}
+				yield return new WaitForSecondsRealtime(0.001f);
+			}
+		}
+
+	}
 
 	public void Normal_Land_Buy_UI()
 	{
@@ -126,6 +316,7 @@ public class UI_Setting_S : MonoBehaviour
 	//구매UI X버튼 눌렀을 때
 	public void Normal_Buy_Button_X()
     {
+
 		state = false;
 		state_time = 0f;
 		//집 버튼 눌렀을 때 체크 버튼 false로, 인수할 때도 마찬가지로
@@ -140,6 +331,7 @@ public class UI_Setting_S : MonoBehaviour
 		UI_Ob.transform.GetChild(0).gameObject.SetActive(false);
 		Player_1.GetComponent<Player_S>().UI_Buy_bool = false;
 
+		
 	}
 
 	public void Festival_Buy_Button_X()
@@ -187,7 +379,7 @@ public class UI_Setting_S : MonoBehaviour
 		state = false;
 		state_time = 0f;
 		UI_Ob.transform.GetChild(7).gameObject.SetActive(false);
-
+		Money_position(2);
 	}
 	public void Take_Button_No()
 	{
@@ -259,7 +451,7 @@ public class UI_Setting_S : MonoBehaviour
 		Buy_text.GetComponent<Text>().text = buy_sum.ToString();
 	}
 
-	public void Buy_Butoon()
+	public void Buy_Button()
     {
 		
 		state = false;
@@ -275,7 +467,8 @@ public class UI_Setting_S : MonoBehaviour
 		House(1);
 
 		money_number = 1;
-
+		Debug.Log("삼");
+		Money_position(4);
 		//Victory(3);
 	}
 
@@ -295,10 +488,10 @@ public class UI_Setting_S : MonoBehaviour
 	}
 
 	public void Start_UI()
-	{
-		
+    {
+		Debug.Log("스타트");
+		Money_position(3);
 	}
-
 
 	public void Accident_UI() //8번 지역에 도착하면 차가 달려와서 교통사고 나고 layer 바뀌어서 조명 8번에만 비추고 UI 출력
 	{
@@ -671,15 +864,6 @@ public class UI_Setting_S : MonoBehaviour
 		state = true;
 		Season_Effect();
 	}
-	/*
-	IEnumerator Delay_2() //교통사고
-	{
-
-		yield return new WaitForSeconds(3f); // 해당 시간동안 기다림
-		Debug.Log("코루틴");
-		state = true;
-		Season_Effect();
-	}*/
 
 
 }
