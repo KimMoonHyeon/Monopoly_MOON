@@ -108,7 +108,7 @@ public class Loby_S : MonoBehaviour {
 			Background_image_Box.transform.localScale += new Vector3(0.04f, 0.06f, 0.0f);
 			Debug.Log(Background_image_Box.gameObject.GetComponent<RectTransform>().localScale.x);
 
-			if (Background_image_Box.gameObject.GetComponent<RectTransform>().localScale.x >= 0.39f)
+			if (Background_image_Box.gameObject.GetComponent<RectTransform>().localScale.x >= 0.29f)
 			{
 				StopCoroutine(box_cor);
 				Background_image.gameObject.SetActive(true);
